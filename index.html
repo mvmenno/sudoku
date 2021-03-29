@@ -2,7 +2,7 @@
 <head>
     <title>Sodoku</title>
 
-    <script src="main.js"></script>
+    <script src="build/bundle.js"></script>
 </head>
 
 
@@ -10,12 +10,56 @@
     <h1>Sudoku</h1>
     <table class="sudoku">
     </table>
+    <div class="remaining">
+        <span class="rm-1">1</span>
+        <span class="rm-2">2</span>
+        <span class="rm-3">3</span>
+        <span class="rm-4">4</span>
+        <span class="rm-5">5</span>
+        <span class="rm-6">6</span>
+        <span class="rm-7">7</span>
+        <span class="rm-8">8</span>
+        <span class="rm-9">9</span>
 
-
+        <span class="time">0sec</span>
+    </div>
+    <div class="new"><button class="btn-new">New game</button></div>
 </div>
 <style>
-.sudoku{
+body{
+    background:#333;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+h1{
+    color: #fff;
+}
+.content{
 
+    margin:0 auto;
+    max-width:480px;
+}
+.content .new{
+    margin-top:20px;
+}
+.remaining{
+    background:#fff;
+    padding:10px;
+    border-radius:10px;
+    max-width:250px;
+    text-align: center;
+    margin-top:20px;
+    font-weight:bold;
+    
+}
+.remaining .time{
+    background:#666;
+    padding:5px;
+    float:right;    
+    margin-top: -5px;
+    min-width:60px;
+}
+
+.sudoku{
     border-collapse: collapse;
 }
 .sudoku tr{
@@ -29,6 +73,11 @@
     height:50px;
     border:1px solid #666;
 }    
+.sudoku tr td input{
+    background:rgb(180, 204, 255);
+}  
+
+
 .sudoku tr:nth-child(1) td{
     border-top:solid 2px;
 }
@@ -47,7 +96,10 @@
     width:100%;
     height:100%;
     border:0;
+    color:#222;
     text-align: center;
+    font-weight:600;
+    font-size:1.4rem;
 }
 
 </style>
