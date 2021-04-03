@@ -41,7 +41,7 @@ export class Generator{
         }
         this.solvedBoard = JSON.parse(JSON.stringify(this.board));
 
-        var removeNumberCount =48;
+        var removeNumberCount =56;
 
         var toRemoveArray: number[][] = [];
         x = null;
@@ -108,14 +108,9 @@ export class Generator{
                 rd = -1;
             }
             if(type == 'shiftRow'){
-                console.log('Shift row!');
-                console.log('from:'+nr+' to:'+(nr + rd));
                 var boardNew = this.insertAndShift(board,nr,nr + rd);
                 board = boardNew;
             }else{
-                console.log('Shift Column!');
-                console.log('from:'+nr+' to:'+(nr + rd));
-
                 for(var y=0;y < this.gridSize ; y++){
                    board[y] = this.insertAndShift(board[y],nr,nr + rd);
                 }

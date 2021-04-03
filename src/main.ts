@@ -117,14 +117,15 @@ class SudokuGame{
                 var remainEl = <HTMLElement>document.getElementsByClassName('remaining')[0].querySelector('span[class="rm-'+i+'"]');
                 remainEl.style.visibility = "visible";
             }
-
         }
-
+        var solvedEl = <HTMLElement>document.getElementsByClassName('solved')[0];
         if(JSON.stringify(this.board) == JSON.stringify(this.solvedBoard)){
-            alert('Completed sudoku!');
+            solvedEl.style.visibility = "visible";
             this.storage.save("");
-            this.reset();
+            //this.reset();
 
+        }else{
+            solvedEl.style.visibility = "hidden";
         }
 
 
