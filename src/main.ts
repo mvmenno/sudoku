@@ -1,4 +1,6 @@
 import {Storage} from './storage';
+import {Generator} from './generator';
+import {Solver} from './solver';
 
 class SudokuGame{
     public board :number[][];
@@ -10,11 +12,15 @@ class SudokuGame{
 	protected validBoard = false;
     protected ts = 0;
 
-
     protected storage:Storage;
+    protected generator:Generator;
+    protected solver:Solver;
 
     constructor(){
         this.storage = new Storage();
+        this.generator = new Generator();
+        this.solver = new Solver();
+
         this.reset();
     }
     reset(){
@@ -25,7 +31,7 @@ class SudokuGame{
         this.shiftRows = [];
         this.validBoard = false;
         this.boardEl = <HTMLElement>document.getElementsByClassName('sudoku')[0];
-        this.generateBoard();
+        this.createBoard();
 
         var self = this;
         setInterval(function(){
@@ -33,7 +39,7 @@ class SudokuGame{
         },1000);
     }
 
-    generateBoard(){
+    createBoard(){
         var html = '';
         for(var y=0; y < 9; y ++){
             html += '<tr class="'+y+'">';
@@ -57,7 +63,6 @@ class SudokuGame{
 
         if(loadedData){
             var data = JSON.parse(loadedData);
-            console.log(data);
             if(data.board && data.solvedBoard){
                 validLoadData = true;
                 this.board = data.board.map((x) => x);
@@ -65,121 +70,12 @@ class SudokuGame{
             }
         }
         if(!validLoadData){
-            this.generatePresetValues();
+           this.board = this.generator.generatePresetValues();
+           this.solvedBoard = this.generator.getSolvedBoard();
         }
 
         this.updateBoard();
     }
-    protected generatePresetValues(){
-		var r1 = 3;	
-		var r2 = 1;
-
-        for(var y=0;y < 9; y++){
-			if(y == 1 || y == 2 || y ==4 || y == 5 || y == 7 || y ==8){
-				this.shiftRows[y] = r1;
-			}else if(y > 0){
-				this.shiftRows[y] = r2;
-			}
-			
-            for(var x=0;x <9;x++){
-                this.solverCheck(y,x);
-            }
-        }
-        this.solvedBoard = JSON.parse(JSON.stringify(this.board));
-
-        for(var y=0;y < 9; y++){
-            for(var x=0;x <9;x++){
-				var chance = Math.random();
-				
-				if(chance < .1){
-					this.board[y][x] = 0;
-				}	
-            }
-        }
-		
-		// randomize rows
-		
-		var shiftRounds = 3;
-		var self = this;
-		
-		for(var i = 0; i < shiftRounds; i ++ ){
-			var from = Math.floor(Math.random() * 9) + 1;
-			var r2 = Math.floor(Math.random() * (8 - 4 + 1) + 4);
-			
-			//var r2 = Math.floor(Math.random() * 8) + 1; 
-			
-		
-			var to = from + r2;
-			if(to >= 9){
-				to = to - 8;
-			}
-			
-			//var newArr = this.insertAndShift(this.board,from,to);
-			//this.board = newArr;
-		}
-		this.validBoard = true;
-		
-		
-		
-		
-		//var newArr = this.insertAndShift(this.board,1,5);
-		
-		//this.board = newArr;
-		
-	}
-	
-	protected insertAndShift(arr, from, to) {
-		var arrNew = arr.map((x) => x);
-		
-		let cutOut = arrNew.splice(from, 1) [0]; // cut the element at index 'from'
-		arrNew.splice(to, 0, cutOut);            // insert it at index 'to'
-		
-		return arrNew;
-	}
-    protected solverCheck(y:number,x:number){
-	
-		var valid = true;
-		var foundValid = false;
-		
-		var c = 0;
-		var maxCount = 1000;
-		var n = 0;
-		
-		var shift = 0; 
-		if(y != 0){
-			shift = this.shiftRows[y];
-		}
-		
-		if(y ==0){
-			
-			while(!foundValid && c < maxCount){
-				n = Math.floor(Math.random() * 9) + 1;
-				if(this.used.indexOf(n) === -1){
-					this.used.push(n);					
-					valid = true;
-				}else{
-					valid = false;
-				}
-				if(valid){
-					this.board[y][x] = n;
-					foundValid = true;
-				}
-				
-				c++;
-		
-			}
-		}else{
-			if(y > 0){
-				var xs = x + shift;
-				if(xs >= 9){
-					xs = xs - 9;
-				}
-				
-				this.board[y][x] = this.board[y - 1][xs];
-			}
-		}	
-    }
-
     update(){
         var el = Math.floor((Date.now() - this.ts) / 1000);
         var timeEl = <HTMLElement>document.getElementsByClassName('time')[0];
@@ -188,7 +84,6 @@ class SudokuGame{
 
     public updateBoard(){
         this.boardEl = <HTMLElement>document.getElementsByClassName('sudoku')[0];
-        console.log(this.board);
 
         var cntNumbers = [];
 
@@ -207,18 +102,15 @@ class SudokuGame{
                 if(this.board[y][x] !== 0){
                    input.value = this.board[y][x].toString();
                 }
-                console.log(this.board[y][x]);
                 if(!cntNumbers[this.board[y][x]]){
                     cntNumbers[this.board[y][x]] = 0;
                 }
                 cntNumbers[this.board[y][x]] ++;
             }
         }
-        console.log(cntNumbers);
 
         for(var i=1; i <= 9; i++){
             if(cntNumbers[i] >= 9){
-                console.log('MAKE HIDEN!');
                 var remainEl = <HTMLElement>document.getElementsByClassName('remaining')[0].querySelector('span[class="rm-'+i+'"]');
                 remainEl.style.visibility = "hidden";
             }else{
@@ -299,6 +191,7 @@ window.onload = function(){
 			game.updateValue(parseInt(classSplit[0]),parseInt(classSplit[1]));
             game.updateBoard();
         });
+        
     }
 
     var btnNew = document.getElementsByClassName('btn-new')[0];
